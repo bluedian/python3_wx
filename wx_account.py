@@ -12,11 +12,17 @@ class wx_account():
         self.wx_account_memo = ''
         self.server_address = 'http://www.123.com/index.php/wx/'
 
-    def getServerWxAccount(self):
+    def synsServer(self,data=None):
         mod = 'apiaccount/'
-        data = {
-            'model': 'get_wx_account',
-        }
+        if data is None:
+            data={}
+            data['model'] = 'get_wx_account'
+        url_server_all = self.server_address + mod
+        html = unit_reqests.postHtmlData(url_server_all, data=data)
+        return html
+
+    def updateServerWxAccount(self,data):
+        mod = 'apiaccount/'
         url_server_all = self.server_address + mod
         html = unit_reqests.postHtmlData(url_server_all, data=data)
         return html
@@ -57,6 +63,7 @@ class wx_account():
                 account_new_url = dt0[1].find('a').attrs['href']
 
             account_info = {
+                'model':'update_wx_account',
                 'account_login': account_login,
                 'account_name': account_name,
                 'account_name_url': account_name_url,
@@ -65,9 +72,11 @@ class wx_account():
                 'account_new_name': account_new_name,
                 'account_new_url': account_new_url,
             }
-            print(account_info)
+            #print(account_info)
+            print(wx_account().synsServer(data=account_info))
+
 
 if __name__ == '__main__':
-    wx_account().getServerWxAccount()
+    wx_account().synsServer()
     wx_account().getUrlWxSogou(account_name='新华网')
     wx_account().getWxSogouContext('http://wx.sogou.com/weixin?type=1&s_from=input&ie=utf8&query=C114通信网')
