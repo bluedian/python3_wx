@@ -18,7 +18,7 @@ headers = {
 def getHtml(query_url, dubeg=False):
     if query_url is None:
         return
-    req = requests.get(query_url)
+    req = requests.get(query_url, headers=headers)
     req.encoding = req.apparent_encoding
     html = req.text
     if dubeg:
@@ -36,7 +36,7 @@ def postHtmlData(query_url, data=None, dubeg=False):
     if query_url is None:
         return
     if data:
-        req = requests.post(query_url, data=data)
+        req = requests.post(query_url, data=data, headers=headers)
     else:
         req = requests.post(query_url)
     req.encoding = req.apparent_encoding
