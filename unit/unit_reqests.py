@@ -29,6 +29,7 @@ def getHtml(query_url, dubeg=False):
         print('调试-----end------>')
     if req.status_code == 200:
         return html
+    print('error-->URL:'+query_url)
     return req.status_code
 
 

@@ -13,8 +13,8 @@ class wx_account():
         self.wx_account_name = ''
         self.wx_account_authname = ''
         self.wx_account_memo = ''
-        #self.server_address = 'http://www.123.com/index.php/wx/'
-        self.server_address = 'http://oa.9oe.com/index.php/wx/'
+        self.server_address = 'http://www.123.com/index.php/wx/'
+        #self.server_address = 'http://oa.9oe.com/index.php/wx/'
 
     def synsServer(self, data=None):
         mod = 'apiaccount'
@@ -80,11 +80,7 @@ class wx_account():
                 query_list.append(new_query_url)
 
         except:
-            one_soup = soup.find('ul', 'news-list2')
-            if one_soup:
-                two_soup = one_soup.find_all('li')
-                print('在这里', len(two_soup))
-            print('在这里111', one_soup)
+            print('页面无数据')
 
         return query_list, query_num
 
@@ -95,7 +91,7 @@ class wx_account():
         soup = BeautifulSoup(html, 'html.parser')
         try:
             query_list = soup.find('ul', 'news-list2').find_all('li')
-            print(query_list)
+            #print(query_list)
             for itme in query_list:
                 account_login = itme.find('p', 'info').find('label').get_text()
                 account_name = itme.find('p', 'tit').find('a').get_text()
@@ -146,15 +142,20 @@ class wx_account():
             for subitme in run_josn['data']:
                 find_url = self.getUrlWxSogou(account_name=subitme['name'])
                 find_list,find_num = self.findWxSogou(find_url)
+                print(type(find_num))
+
+                data = {
+                    'model': 'update_wx_account_key',
+                    'name': subitme['name'],
+                    'number': find_num,
+                    'id': subitme['id'],
+                }
+                print(wx_account().synsServer(data=data))
+
                 if find_num==0:
-                    data={
-                        'model':'update_wx_account_key',
-                        'name':subitme['name'],
-                        'number':0,
-                        'id':subitme['id'],
-                    }
-                    print(wx_account().synsServer(data=data))
                     break
+
+                print('进行数据采集工作')
                 for item_url in find_list:
                     self.getWxSogouContext(item_url, acc_name=subitme['name'])
                     print(item_url)
@@ -164,6 +165,9 @@ class wx_account():
 
 if __name__ == '__main__':
     wx_account().run()
+    #abc,abc2=wx_account().findWxSogou('http://wx.sogou.com/weixin?type=1&s_from=input&ie=utf8&query=二更')
+    #print(abc2)
+    #print(type(abc2))
     #print(wx_account().findWxSogou('http://wx.sogou.com/weixin?type=1&s_from=input&ie=utf8&query=二更'))
     #print(wx_account().findWxSogou('http://wx.sogou.com/weixin?type=1&s_from=input&ie=utf8&query=新华网'))
     #print(wx_account().findWxSogou('http://wx.sogou.com/weixin?type=1&s_from=input&ie=utf8&query=扬子晚报'))
