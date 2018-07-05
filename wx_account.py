@@ -13,20 +13,21 @@ class wx_account():
         self.wx_account_name = ''
         self.wx_account_authname = ''
         self.wx_account_memo = ''
-        self.server_address = 'http://www.123.com/index.php/wx/'
-        #self.server_address = 'http://oa.9oe.com/index.php/wx/'
+        #self.server_address = 'http://www.123.com/index.php/wx/'
+        self.server_address = 'http://oa.9oe.com/index.php/wx/'
 
     def synsServer(self, data=None):
-        mod = 'apiaccount/'
+        mod = 'apiaccount'
         if data is None:
             data = {}
             data['model'] = 'get_wx_account_key'
         url_server_all = self.server_address + mod
+        print(url_server_all)
         html = unit_reqests.postHtmlData(url_server_all, data=data)
         return html
 
     def synsServerUpdateAccountKey(self, data=None):
-        mod = 'apiaccount/'
+        mod = 'apiaccount'
         if data is None:
             data = {}
             data['model'] = 'update_wx_account_key'
