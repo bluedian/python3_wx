@@ -13,8 +13,8 @@ class wx_account():
         self.wx_account_name = ''
         self.wx_account_authname = ''
         self.wx_account_memo = ''
-        #self.server_address = 'http://www.123.com/index.php/wx/'
-        self.server_address = 'http://oa.9oe.com/index.php/wx/'
+        self.server_address = 'http://www.123.com/index.php/wx/'
+        #self.server_address = 'http://oa.9oe.com/index.php/wx/'
 
     def synsServer(self, data=None):
         mod = 'apiaccount/'
@@ -138,9 +138,9 @@ class wx_account():
 
     def run(self):
         run_jobs = self.synsServer()
+        print(run_jobs)
         run_josn = json.loads(run_jobs)
         print(run_josn)
-
         if run_josn['list'] > 0:
             for subitme in run_josn['data']:
                 find_url = self.getUrlWxSogou(account_name=subitme['name'])
