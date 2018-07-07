@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 import json
 import time
 import math
+import redis
 
 
 class wx_account():
@@ -13,8 +14,11 @@ class wx_account():
         self.wx_account_name = ''
         self.wx_account_authname = ''
         self.wx_account_memo = ''
-        #self.server_address = 'http://www.123.com/index.php/wx/'
+        # self.server_address = 'http://www.123.com/index.php/wx/'
         self.server_address = 'http://oa.9oe.com/index.php/wx/'
+        self.redis_server_address = 'localhost'
+        self.redis_server_port = 6379
+        self.redis_server_db = 0
 
     def synsServer(self, data=None):
         mod = 'apiaccount'
@@ -91,7 +95,7 @@ class wx_account():
         soup = BeautifulSoup(html, 'html.parser')
         try:
             query_list = soup.find('ul', 'news-list2').find_all('li')
-            #print(query_list)
+            # print(query_list)
             for itme in query_list:
                 account_login = itme.find('p', 'info').find('label').get_text()
                 account_name = itme.find('p', 'tit').find('a').get_text()
@@ -133,6 +137,35 @@ class wx_account():
         except:
             return
 
+    def redisServerGetList(self):
+        rds = redis.Redis(self.redis_server_address, 6379, 0)
+        print(rds.lrange('wx_account', 0, -1))
+
+
+    def redisServerSetList(self):
+        rds = redis.Redis(self.redis_server_address, 6379, 0 ,decode_responses=True)
+        #rds = redis.Redis(self.redis_server_address, 6379, 0)
+        #for i in range(1,3):
+        #    rds.lpush('wx_account','http://www.baidu.com'+str(i))
+            #rds.set('foo', 'ff')
+
+        if 'http://www.baidu.com1' in rds.lrange('wx_account',0,-1):
+            print('存在:'+'http://www.baidu.com1')
+        else:
+            print('不存在:' + 'http://www.baidu.com1')
+
+        if 'http://www.baidu.com100' in rds.lrange('wx_account',0,-1):
+            print('存在:'+'http://www.baidu.com100')
+        else:
+            print('不存在')
+            rds.lpush('wx_account', 'http://www.baidu.com100')
+
+        print
+
+    def redisServerLenList(self):
+        rds = redis.Redis(self.redis_server_address, 6379, 0)
+        print(rds.llen('wx_account'))
+
     def run(self):
         run_jobs = self.synsServer()
         print(run_jobs)
@@ -141,7 +174,7 @@ class wx_account():
         if run_josn['list'] > 0:
             for subitme in run_josn['data']:
                 find_url = self.getUrlWxSogou(account_name=subitme['name'])
-                find_list,find_num = self.findWxSogou(find_url)
+                find_list, find_num = self.findWxSogou(find_url)
                 print(type(find_num))
 
                 data = {
@@ -152,7 +185,7 @@ class wx_account():
                 }
                 print(wx_account().synsServer(data=data))
 
-                if find_num==0:
+                if find_num == 0:
                     break
 
                 print('进行数据采集工作')
@@ -164,14 +197,17 @@ class wx_account():
 
 
 if __name__ == '__main__':
-    wx_account().run()
-    #abc,abc2=wx_account().findWxSogou('http://wx.sogou.com/weixin?type=1&s_from=input&ie=utf8&query=二更')
-    #print(abc2)
-    #print(type(abc2))
-    #print(wx_account().findWxSogou('http://wx.sogou.com/weixin?type=1&s_from=input&ie=utf8&query=二更'))
-    #print(wx_account().findWxSogou('http://wx.sogou.com/weixin?type=1&s_from=input&ie=utf8&query=新华网'))
-    #print(wx_account().findWxSogou('http://wx.sogou.com/weixin?type=1&s_from=input&ie=utf8&query=扬子晚报'))
-    #print(wx_account().findWxSogou('http://wx.sogou.com/weixin?type=1&s_from=input&ie=utf8&query=sfsfsfffsfsfsdfd'))
-    #print(wx_account().synsServer())
+    wx_account().redisServerSetList()
+    wx_account().redisServerGetList()
+    wx_account().redisServerLenList()
+    # wx_account().run()
+    # abc,abc2=wx_account().findWxSogou('http://wx.sogou.com/weixin?type=1&s_from=input&ie=utf8&query=二更')
+    # print(abc2)
+    # print(type(abc2))
+    # print(wx_account().findWxSogou('http://wx.sogou.com/weixin?type=1&s_from=input&ie=utf8&query=二更'))
+    # print(wx_account().findWxSogou('http://wx.sogou.com/weixin?type=1&s_from=input&ie=utf8&query=新华网'))
+    # print(wx_account().findWxSogou('http://wx.sogou.com/weixin?type=1&s_from=input&ie=utf8&query=扬子晚报'))
+    # print(wx_account().findWxSogou('http://wx.sogou.com/weixin?type=1&s_from=input&ie=utf8&query=sfsfsfffsfsfsdfd'))
+    # print(wx_account().synsServer())
     # wx_account().getUrlWxSogou(account_name='新华网')
     # wx_account().getWxSogouContext('http://wx.sogou.com/weixin?type=1&s_from=input&ie=utf8&query=C114通信网')
